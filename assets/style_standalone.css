@@ -147,7 +147,7 @@ html, body {
 .navbar-title {
   color: var(--blanco);
   font-family: 'Montserrat', sans-serif;
-  font-size: 1.28rem;
+  font-size: 2rem;
   font-weight: 800;
   letter-spacing: 0.6px;
   line-height: 1.15;
@@ -169,7 +169,7 @@ html, body {
 .navbar-subtitle {
   color: rgba(255,255,255,0.62);
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.65rem;
+  font-size: 0.88rem;
   font-weight: 500;
   letter-spacing: 0.5px;
   white-space: nowrap;
