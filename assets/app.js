@@ -467,31 +467,29 @@ async function distritosComparados(clave, estacion) {
 }
 
 // ─── Interpretaciones textuales ───────────────────────────
+// El globo de cada variable lleva su nombre y qué mide. Llevaba también
+// los sectores a los que afecta, pero eran los mismos cuatro rótulos en
+// casi todas y ocupaban un tercio del globo sin decir nada del dato.
 const VAR_INFO = {
   pr: {
     title: "Precipitación",
     desc: "Muestra el cambio porcentual proyectado en las lluvias para 2036–2065 respecto al período de referencia 1981–2010. Valores negativos indican reducción de lluvias; positivos, aumento.",
-    sectores: ["Agua", "Agricultura", "Energía hidráulica", "Gestión de riesgos"],
   },
   tasmax: {
     title: "Temperatura Máxima",
     desc: "Cambio proyectado en la temperatura máxima diaria (°C). Refleja cuánto más calurosos serán los días más cálidos del año en el futuro.",
-    sectores: ["Salud", "Agricultura", "Infraestructura", "Biodiversidad"],
   },
   tasmin: {
     title: "Temperatura Mínima",
     desc: "Cambio proyectado en la temperatura mínima diaria (°C). Afecta principalmente las heladas, la biodiversidad altoandina y los ciclos agrícolas.",
-    sectores: ["Agricultura", "Ganadería", "Biodiversidad", "Energía"],
   },
   indices: {
     title: "Índices extremos de temperatura",
     desc: "Cuatro índices ETCCDI que no describen el promedio sino el extremo del período: <strong>TXx</strong> el día más caluroso y <strong>TXn</strong> el más fresco, ambos de la temperatura máxima diaria; <strong>TNx</strong> la noche más cálida y <strong>TNn</strong> la más fría, de la mínima. Se publican como cambio en grados frente a 1981–2010.",
-    sectores: ["Salud", "Agricultura", "Ganadería", "Gestión de riesgos"],
   },
   imc: {
     title: "Índice Multipeligro Climático",
     desc: "Combina múltiples amenazas climáticas (lluvias extremas, sequías, temperaturas) en un índice normalizado de 0 a 1. A mayor valor, mayor exposición simultánea a peligros.",
-    sectores: ["Planificación territorial", "Gestión de riesgos", "Todos los sectores"],
   },
 };
 
@@ -1543,11 +1541,10 @@ function buildImcLegend() {
 }
 
 // ─── El filete de la escala ───────────────────────────────
-// El tema SORIΛN abre la cabecera y cierra el pie con tres píxeles de la
-// rampa del dato. PEGASO no tiene una rampa sino varias —una por variable,
-// más la de la brecha y la del índice—, así que el filete no es fijo: se
-// reescribe con la escala que el mapa está pintando. Fuera de ese tema la
-// variable no la lee nadie y no cuesta nada.
+// La cabecera se abre y el pie se cierra con tres píxeles de la rampa del
+// dato. PEGASO no tiene una rampa sino varias —una por variable, más la de
+// la brecha y la del índice—, así que el filete no es fijo: se reescribe
+// con la escala que el mapa está pintando.
 function gradienteDe(colores) {
   const ultimo = colores.length - 1;
   const paradas = colores.map((c, i) => `${c} ${(i / ultimo * 100).toFixed(2)}%`);
@@ -1800,7 +1797,7 @@ setupRadioGroup("refLayerGroup", value => {
   cargarReferencia(value);
 });
 
-// ─── Escenario de emisiones ───────────────────────────────
+// ─── Escenarios climáticos ────────────────────────────────
 // Dos cápsulas y un tercer estado: comparar. Elegir un escenario apaga la
 // comparación, y comparar no borra cuál estaba elegido —al volver, el mapa
 // vuelve al que el usuario tenía.
@@ -2049,10 +2046,7 @@ document.querySelectorAll(".var-info-btn").forEach(btn => {
     tip.className = "var-tooltip";
     tip.innerHTML = `
       <div class="var-tooltip-title">${info.title}</div>
-      <div>${info.desc}</div>
-      <div class="var-tooltip-sector">
-        ${info.sectores.map(s => `<span class="var-tooltip-tag">${s}</span>`).join("")}
-      </div>`;
+      <div>${info.desc}</div>`;
 
     document.body.appendChild(tip);
     activeVarTooltip = tip;
@@ -2204,44 +2198,6 @@ brandName.addEventListener("click", e => {
 // Se cierra al tocar en cualquier otro sitio o al empezar a usar el mapa
 document.addEventListener("click", cerrarNombreCompleto);
 document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarNombreCompleto(); });
-
-// ─── Conmutador de estilo ─────────────────────────────────
-// La plataforma tiene dos temas: el institucional de siempre y el del
-// marco SORIΛN. El segundo entra por un atributo en <html> y una hoja
-// que no pinta nada sin él, así que cambiar de estilo no recarga nada
-// ni toca el mapa. La elección se guarda y el <head> la aplica antes
-// del primer pintado.
-const TEMA_CLAVE = "pegaso-tema";
-const temaSwitch = document.getElementById("temaSwitch");
-
-function enSorian() {
-  return document.documentElement.dataset.tema === "sorian";
-}
-
-function rotularTema() {
-  const activo = enSorian();
-  // La etiqueta nombra lo que el botón controla y aria-pressed dice si
-  // está puesto: es el par que espera un lector de pantalla, y evita
-  // reescribir el texto en cada pulsación.
-  temaSwitch.setAttribute("aria-pressed", String(activo));
-  temaSwitch.title = activo
-    ? "Volver al estilo institucional de PEGASO"
-    : "Ver PEGASO con el estilo SORIAN";
-}
-
-function aplicarTema(tema) {
-  if (tema === "sorian") document.documentElement.dataset.tema = "sorian";
-  else delete document.documentElement.dataset.tema;
-  // La barra del navegador acompaña al cromo de la página
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", tema === "sorian" ? "#061027" : "#0a1c48");
-  try { localStorage.setItem(TEMA_CLAVE, tema); } catch (e) { /* sin guardar */ }
-  rotularTema();
-}
-
-temaSwitch.addEventListener("click", () => aplicarTema(enSorian() ? "casa" : "sorian"));
-
-rotularTema();
 
 // ─── Leyenda plegable ─────────────────────────────────────
 const mapLegend    = document.getElementById("mapLegend");

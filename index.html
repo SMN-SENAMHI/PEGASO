@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a1c48" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="description" content="PEGASO — Escenarios de cambio climático para el Perú. SENAMHI · MINAM. Escenarios SSP2-4.5 y SSP5-8.5 CMIP6, resolución 5 km, período 2036–2065." />
   <title>PEGASO — Plataforma de Escenarios de Cambio Climático para la Gestión y la Adaptación en los Servicios Sectoriales</title>
 
@@ -14,7 +14,9 @@
   <link rel="manifest" href="site.webmanifest" />
   <meta name="apple-mobile-web-app-title" content="PEGASO" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- La barra es blanca: en black-translucent la hora y la batería se
+       pintan en blanco encima de ella y no se ven -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -29,18 +31,10 @@
   <!-- Estilos propios -->
   <!-- ?v= : subir este número al cambiar los archivos, o el navegador
        seguirá con la copia en caché hasta diez minutos después -->
-  <link rel="stylesheet" href="assets/style_standalone.css?v=12" />
-  <!-- Tema SORIΛN: no pinta nada mientras <html> no lleve data-tema -->
-  <link rel="stylesheet" href="assets/tema_sorian.css?v=5" />
-
-  <script>
-    /* El tema elegido se aplica antes del primer pintado. Si esperase a
-       app.js, la barra aparecería en un estilo y saltaría al otro. */
-    try {
-      if (localStorage.getItem("pegaso-tema") === "sorian")
-        document.documentElement.setAttribute("data-tema", "sorian");
-    } catch (e) { /* almacenamiento cerrado: se abre con el tema de casa */ }
-  </script>
+  <link rel="stylesheet" href="assets/style_standalone.css?v=15" />
+  <!-- El estilo SORIΛN, que es ya el de la casa: va después porque
+       matiza la hoja de arriba, no la sustituye -->
+  <link rel="stylesheet" href="assets/tema_sorian.css?v=13" />
 </head>
 <body>
 
@@ -54,10 +48,7 @@
     <div class="navbar-brand">
       <img src="assets/Minam.png" alt="MINAM" class="navbar-logo-minam" />
       <div class="navbar-divider"></div>
-      <img src="assets/logo_senamhi.png" alt="SENAMHI" class="navbar-logo" />
-      <!-- El mismo logo a color: el negativo se pierde sobre la barra clara
-           del tema SORIΛN, y cambiar el src desde JS deja un parpadeo -->
-      <img src="assets/logo_senamhi_color.png" alt="" aria-hidden="true" class="navbar-logo navbar-logo-color" />
+      <img src="assets/logo_senamhi_color.png" alt="SENAMHI" class="navbar-logo" />
       <div class="navbar-divider"></div>
       <div class="brand-mark">
         <button type="button" class="brand-name" id="brandName"
@@ -70,14 +61,6 @@
       </div>
     </div>
     <div class="navbar-right">
-      <!-- Paso de un tema al otro. El nombre lleva lambda y no A, así que
-           el botón se anuncia por su aria-label —que sustituye al texto
-           visible— en lugar de deletrear «SORI lambda N». -->
-      <button type="button" class="tema-switch" id="temaSwitch" aria-pressed="false"
-              aria-label="Estilo SORIAN" title="Ver PEGASO con el estilo SORIAN">
-        <span class="tema-switch-muestra" aria-hidden="true"></span>
-        <span class="tema-switch-texto" aria-hidden="true">Estilo <span class="tema-switch-marca">SORIΛN</span></span>
-      </button>
       <!-- En teléfono el MINAM se traslada al extremo derecho de la barra -->
       <img src="assets/Minam.png" alt="MINAM" class="navbar-logo-minam-movil" />
     </div>
@@ -99,9 +82,12 @@
         <span>Controles</span>
       </div>
 
-      <!-- Sección: Escenario de emisiones — dos trayectorias y su brecha -->
+      <!-- Sección: los dos escenarios climáticos y su brecha. La sección se
+           llama por lo que el mapa pinta —el clima que resulta—, y la bajada
+           dice por dónde se eligen: su trayectoria de emisiones. -->
       <div class="sidebar-section">
-        <div class="section-label">Escenario de emisiones</div>
+        <div class="section-label">Escenarios climáticos</div>
+        <div class="section-sublabel">Según su trayectoria de emisiones</div>
         <div class="escenario-capsulas" id="escenarioGroup">
           <span class="capsula-fondo" aria-hidden="true"></span>
           <button type="button" class="capsula" data-value="ssp245" aria-pressed="false">
@@ -475,7 +461,7 @@
           crossorigin="anonymous"></script>
 
   <!-- Lógica principal -->
-  <script src="assets/app.js?v=12"></script>
+  <script src="assets/app.js?v=15"></script>
 
 </body>
 </html>
